@@ -84,7 +84,7 @@ void nomove() {
 }
 
 void skills() {
-    
+    chassis.setPose(0,0,-90);
 }
 
 rd::Selector selector({
