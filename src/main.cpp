@@ -58,11 +58,21 @@ lemlib::ControllerSettings angular_controller(
 lemlib::Chassis chassis(drivetrain, lateral_controller, angular_controller, sensors);
 
 //motors
-//pros::Motor intake1(15);
+pros::Motor color_switcher(15);
+pros::Motor claw(16);
+bool clawOpened = true;
+pros::Motor intake(18);
+pros::Motor lift(17);
 
 //pnumatics
 /*pros::adi::DigitalOut tongue(1);
 bool tongueExtended = false;*/
+
+//sensors
+pros::Optical color_sensor(12);
+
+
+int allianceColor = 0;
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
@@ -74,6 +84,22 @@ void disabled() {
     tongueExtended=!tongueExtended;
     tongue.set_value(tongueExtended);
 }*/
+
+void toAlliance() {
+    double hue = color_sensor.get_hue();
+    // gets color (0 = red, 1 = yellow, 2 = blue)
+    // I <3 ternary operators
+    int color = (hue < 20 || hue > 340) ? (0) : ((hue >= 40 && hue <= 60) ? (1) : ((hue >= 200 && hue <= 240) ? (2) : (-1)));
+
+    if (color == allianceColor) color_switcher.move_velocity(0);
+    else color_switcher.move_velocity(100);
+}
+
+void toggleClaw() {
+    if (clawOpened) claw.move_relative(90, 100);
+    else claw.move_relative(-90, 100);
+    clawOpened = !clawOpened;
+}
 
 void soloawp() {
     chassis.setPose(0,0,-90);
@@ -102,6 +128,8 @@ void initialize() {
 
     left_motors.set_brake_mode(MOTOR_BRAKE_BRAKE);
     right_motors.set_brake_mode(MOTOR_BRAKE_BRAKE);
+    lift.set_brake_mode(MOTOR_BRAKE_HOLD);
+    claw.set_brake_mode(MOTOR_BRAKE_HOLD);
 }
 
 void competition_initialize() {
@@ -124,6 +152,19 @@ void opcontrol() {
         /*if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
             forward = !forward;
         }*/
+
+        //buttons
+        if (controller.get_digital_press(pros::E_CONTROLLER_DIGITAL_Y)) toAlliance();
+        else color_switcher.move_velocity(0);
+
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) toggleClaw();
+
+        if (controller.get_digital_press(pros::E_CONTROLLER_DIGITAL_R2)) intake.move_velocity(100);
+        else intake.move_velocity(0);
+
+        if (controller.get_digital_press(pros::E_CONTROLLER_DIGITAL_L1)) lift.move_velocity(100);
+        else if (controller.get_digital_press(pros::E_CONTROLLER_DIGITAL_L2)) lift.move_velocity(-100);
+        else lift.move_velocity(0);
         
         //driving
         int RightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
