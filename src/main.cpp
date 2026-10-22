@@ -154,16 +154,15 @@ void opcontrol() {
         }*/
 
         //buttons
-        if (controller.get_digital_press(pros::E_CONTROLLER_DIGITAL_Y)) toAlliance();
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) toAlliance();
         else color_switcher.move_velocity(0);
 
-        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) toggleClaw();
-
-        if (controller.get_digital_press(pros::E_CONTROLLER_DIGITAL_R2)) intake.move_velocity(100);
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.move_velocity(-100);
+        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) intake.move_velocity(100);
         else intake.move_velocity(0);
 
-        if (controller.get_digital_press(pros::E_CONTROLLER_DIGITAL_L1)) lift.move_velocity(100);
-        else if (controller.get_digital_press(pros::E_CONTROLLER_DIGITAL_L2)) lift.move_velocity(-100);
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) lift.move_velocity(100);
+        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) lift.move_velocity(-100);
         else lift.move_velocity(0);
         
         //driving
