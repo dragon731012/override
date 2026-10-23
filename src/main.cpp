@@ -4,8 +4,8 @@
 #include "pros/misc.h"
 #include "robodash/api.h"
 
-pros::MotorGroup left_motors({-5, -3, -1});
-pros::MotorGroup right_motors({6, 4, 2});
+pros::MotorGroup left_motors({-3, -1});
+pros::MotorGroup right_motors({4, 2});
 
 lemlib::Drivetrain drivetrain(&left_motors, 
                               &right_motors, 
@@ -138,9 +138,6 @@ void autonomous() {
 }
 
 void opcontrol() {
-    left_motors.set_brake_mode(MOTOR_BRAKE_BRAKE);
-    right_motors.set_brake_mode(MOTOR_BRAKE_BRAKE);
-
 	while (true) {
         /*if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
             forward = !forward;
