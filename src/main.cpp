@@ -60,7 +60,6 @@ lemlib::Chassis chassis(drivetrain, lateral_controller, angular_controller, sens
 //motors
 pros::Motor color_switcher(15);
 pros::Motor claw(16);
-bool clawOpened = true;
 pros::Motor intake(18);
 pros::Motor lift(17);
 
@@ -95,12 +94,6 @@ void toAlliance() {
     else color_switcher.move_velocity(100);
 }
 
-void toggleClaw() {
-    if (clawOpened) claw.move_relative(90, 100);
-    else claw.move_relative(-90, 100);
-    clawOpened = !clawOpened;
-}
-
 void soloawp() {
     chassis.setPose(0,0,-90);
 }
@@ -129,7 +122,7 @@ void initialize() {
     left_motors.set_brake_mode(MOTOR_BRAKE_BRAKE);
     right_motors.set_brake_mode(MOTOR_BRAKE_BRAKE);
     lift.set_brake_mode(MOTOR_BRAKE_HOLD);
-    claw.set_brake_mode(MOTOR_BRAKE_HOLD);
+    claw.set_brake_mode(MOTOR_BRAKE_COAST);
 }
 
 void competition_initialize() {
@@ -157,9 +150,9 @@ void opcontrol() {
         if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) toAlliance();
         else color_switcher.move_velocity(0);
 
-        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.move_velocity(-100);
-        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) intake.move_velocity(100);
-        else intake.move_velocity(0);
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) claw.move_velocity(-200);
+        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) claw.move_velocity(200);
+        else claw.move_velocity(0);
 
         if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) lift.move_velocity(100);
         else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) lift.move_velocity(-100);
