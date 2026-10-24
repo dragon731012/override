@@ -98,7 +98,7 @@ bool toAlliance(bool useop) {
         tickwait--;
         if (color_switcher.get_actual_velocity()<10 && tickwait<1) {
             tickwait = maxtickwait;
-            if (color != allianceColor) { 
+            if (color != allianceColor) {
                 color_switcher.move_relative(180*2, 200);
             } else {
                 color_switcher.move_velocity(0);
