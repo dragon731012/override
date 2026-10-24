@@ -18,7 +18,7 @@ lemlib::Drivetrain drivetrain(&left_motors,
 pros::Imu imu(11);
 
 //pros::Rotation hr1(7);
-pros::Rotation vr2(-14);
+pros::Rotation vr2(-12);
 
 //lemlib::TrackingWheel horizontal_tracking_wheel(&hr1, 2.0, 0.5);
 lemlib::TrackingWheel vertical_tracking_wheel(&vr2, 2.0, 0);
@@ -58,7 +58,7 @@ lemlib::ControllerSettings angular_controller(
 lemlib::Chassis chassis(drivetrain, lateral_controller, angular_controller, sensors);
 
 //motors
-pros::Motor color_switcher(15);
+pros::MotorGroup color_switcher({-14, 15});
 pros::Motor claw(16);
 pros::Motor intake(18);
 pros::Motor lift(17);
@@ -68,7 +68,7 @@ pros::Motor lift(17);
 bool tongueExtended = false;*/
 
 //sensors
-pros::Optical color_sensor(12);
+pros::Optical color_sensor(13);
 
 
 int allianceColor = 0;
@@ -84,16 +84,29 @@ void disabled() {
     tongue.set_value(tongueExtended);
 }*/
 
-void toAlliance() {
-    double hue = color_sensor.get_hue();
-    // gets color (0 = red, 1 = yellow, 2 = blue)
-    // I <3 ternary operators
-    int color = (hue < 20 || hue > 340) ? (0) : ((hue >= 40 && hue <= 60) ? (1) : ((hue >= 200 && hue <= 240) ? (2) : (-1)));
+void toAlliance(bool useop) {
+    if (!useop) {
+        color_switcher.move_velocity(170);
+    } else {
+        double hue = color_sensor.get_hue();
+        // gets color (0 = red, 1 = yellow, 2 = blue)
+        // I <3 ternary operators
+        int color = (hue < 20 || hue > 340) ? (0) : ((hue >= 40 && hue <= 60) ? (1) : ((hue >= 200 && hue <= 240) ? (2) : (-1)));
 
-    if (color == allianceColor) color_switcher.move_velocity(0);
-    else color_switcher.move_velocity(100);
+        if (color == allianceColor) color_switcher.move_velocity(0);
+        else color_switcher.move_velocity(200);
+    }
 }
 
+void blue() {
+    allianceColor = 0;
+}
+
+void red() {
+    allianceColor = 1;
+}
+
+/*
 void soloawp() {
     chassis.setPose(0,0,-90);
 }
@@ -104,12 +117,12 @@ void nomove() {
 
 void skills() {
     chassis.setPose(0,0,-90);
-}
+}*/
 
 rd::Selector selector({
-    {"No Move", nomove},
-    {"Skills", skills},
-    {"Solo AWP", soloawp}
+    /*{"No Move", nomove},*/
+    {"Blue", blue},
+    {"Red", red}
 });
 
 
@@ -133,7 +146,7 @@ void autonomous() {
     if (selector.get_auton().has_value()) {
         selector.run_auton();
     } else {
-        //fallback program here
+        red();
     }
 }
 
@@ -144,12 +157,13 @@ void opcontrol() {
         }*/
 
         //buttons
-        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) toAlliance();
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) toAlliance(false);
+        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) toAlliance(true);
         else color_switcher.move_velocity(0);
 
-        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) claw.move_velocity(-200);
+        /*if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) claw.move_velocity(-200);
         else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) claw.move_velocity(200);
-        else claw.move_velocity(0);
+        else claw.move_velocity(0);*/
 
         if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) lift.move_velocity(100);
         else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) lift.move_velocity(-100);
