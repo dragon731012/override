@@ -59,6 +59,8 @@ lemlib::Chassis chassis(drivetrain, lateral_controller, angular_controller, sens
 
 //motors
 pros::MotorGroup color_switcher({-14, 15});
+int tickwait = 0;
+int maxtickwait = 10;
 pros::Motor claw(16);
 pros::Motor intake(18);
 pros::Motor lift(17);
@@ -69,7 +71,6 @@ bool tongueExtended = false;*/
 
 //sensors
 pros::Optical color_sensor(13);
-
 
 int allianceColor = 0;
 
@@ -84,26 +85,59 @@ void disabled() {
     tongue.set_value(tongueExtended);
 }*/
 
-void toAlliance(bool useop) {
+bool toAlliance(bool useop) {
     if (!useop) {
         color_switcher.move_velocity(170);
+        return false;
     } else {
         double hue = color_sensor.get_hue();
         // gets color (0 = red, 1 = yellow, 2 = blue)
         // I <3 ternary operators
         int color = (hue < 20 || hue > 340) ? (0) : ((hue >= 40 && hue <= 60) ? (1) : ((hue >= 200 && hue <= 240) ? (2) : (-1)));
-
-        if (color == allianceColor) color_switcher.move_velocity(0);
-        else color_switcher.move_velocity(200);
+   
+        tickwait--;
+        if (color_switcher.get_actual_velocity()<10 && tickwait<1) {
+            tickwait = maxtickwait;
+            if (color != allianceColor) { 
+                color_switcher.move_relative(180*2, 200);
+            } else {
+                color_switcher.move_velocity(0);
+                return true;
+            }
+        }
+        return false;
     }
 }
 
+void spinTo() {
+    bool f = true;
+    while (f) f = !toAlliance(true);
+}
+
+void moveBack() {
+    left_motors.move_velocity(-50);
+    right_motors.move_velocity(-50);
+    pros::delay(500);
+    left_motors.move_velocity(0);
+    right_motors.move_velocity(0);
+}
+
 void blue() {
-    allianceColor = 0;
+    allianceColor = 2;
+    color_switcher.move_relative(180*4,170);
+    pros::delay(1000);
+    //spinTo();
+
+    moveBack();
 }
 
 void red() {
-    allianceColor = 1;
+    allianceColor = 0;
+    color_switcher.move_relative(180*4,170);
+    pros::delay(1000);
+    //spinTo();
+
+    moveBack();
 }
 
 /*
@@ -175,6 +209,6 @@ void opcontrol() {
 
         chassis.arcade(LeftY,RightX);
 
-        pros::delay(25);
+        pros::delay(10);
     }
 }
