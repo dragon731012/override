@@ -60,7 +60,7 @@ lemlib::Chassis chassis(drivetrain, lateral_controller, angular_controller, sens
 //motors
 pros::MotorGroup color_switcher({-14, 15});
 int tickwait = 0;
-int maxtickwait = 10;
+int maxtickwait = 30;
 pros::Motor claw(16);
 pros::Motor intake(18);
 pros::Motor lift(17);
@@ -85,7 +85,7 @@ void disabled() {
     tongue.set_value(tongueExtended);
 }*/
 
-bool toAlliance(bool useop) {
+/*bool toAlliance(bool useop) {
     if (!useop) {
         color_switcher.move_velocity(170);
         return false;
@@ -107,11 +107,26 @@ bool toAlliance(bool useop) {
         }
         return false;
     }
-}
+}*/
 
-void spinTo() {
-    bool f = true;
-    while (f) f = !toAlliance(true);
+bool toAlliance(bool useop) {
+    if (!useop) {
+        color_switcher.move_velocity(170);
+        return false;
+    } else {
+        double hue = color_sensor.get_hue();
+        // gets color (0 = red, 1 = yellow, 2 = blue)
+        // I <3 ternary operators
+        int color = (hue < 20 || hue > 340) ? (0) : ((hue >= 40 && hue <= 60) ? (1) : ((hue >= 200 && hue <= 240) ? (2) : (-1)));
+   
+        if (color == allianceColor) {
+            color_switcher.move_velocity(0);
+            return true;
+        } else {
+            color_switcher.move_velocity(200);
+            return false;
+        }
+    }
 }
 
 void moveBack() {
@@ -126,7 +141,6 @@ void blue() {
     allianceColor = 2;
     color_switcher.move_relative(180*4,170);
     pros::delay(1000);
-    //spinTo();
 
     moveBack();
 }
@@ -135,7 +149,6 @@ void red() {
     allianceColor = 0;
     color_switcher.move_relative(180*4,170);
     pros::delay(1000);
-    //spinTo();
 
     moveBack();
 }
@@ -163,6 +176,7 @@ rd::Selector selector({
 void initialize() {
     chassis.calibrate(); 
     selector.focus();  
+    color_sensor.set_integration_time(10);
 
     //pros::lcd::initialize();
 
