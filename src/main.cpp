@@ -119,6 +119,8 @@ bool toAlliance(bool useop) {
         // I <3 ternary operators
         int color = (hue < 20 || hue > 340) ? (0) : ((hue >= 40 && hue <= 60) ? (1) : ((hue >= 200 && hue <= 240) ? (2) : (-1)));
    
+        // if the color is the alliance color, stop the motor
+        // otherwise, keep it spinning
         if (color == allianceColor) {
             color_switcher.move_velocity(0);
             return true;
