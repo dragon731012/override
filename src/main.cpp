@@ -184,6 +184,7 @@ void initialize() {
 
     left_motors.set_brake_mode(MOTOR_BRAKE_BRAKE);
     right_motors.set_brake_mode(MOTOR_BRAKE_BRAKE);
+    color_switcher.set_brake_mode_all(MOTOR_BRAKE_COAST);
     lift.set_brake_mode(MOTOR_BRAKE_HOLD);
     claw.set_brake_mode(MOTOR_BRAKE_COAST);
 }
