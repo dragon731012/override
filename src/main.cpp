@@ -61,9 +61,10 @@ lemlib::Chassis chassis(drivetrain, lateral_controller, angular_controller, sens
 pros::MotorGroup color_switcher({-14, 15});
 int tickwait = 0;
 int maxtickwait = 30;
-pros::Motor claw(16);
+pros::Motor claw(20);
 pros::Motor intake(18);
-pros::Motor lift(17);
+
+pros::MotorGroup lift({-16, 17});
 
 //pnumatics
 /*pros::adi::DigitalOut tongue(1);
@@ -208,16 +209,16 @@ void opcontrol() {
         }*/
 
         //buttons
-        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) toAlliance(false);
-        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) toAlliance(true);
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) toAlliance(true);
+        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) toAlliance(false);
         else color_switcher.move_velocity(0);
 
-        /*if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) claw.move_velocity(-200);
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) claw.move_velocity(-200);
         else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) claw.move_velocity(200);
-        else claw.move_velocity(0);*/
+        else claw.move_velocity(0);
 
-        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) lift.move_velocity(100);
-        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) lift.move_velocity(-100);
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) lift.move_velocity(200);
+        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) lift.move_velocity(-200);
         else lift.move_velocity(0);
         
         //driving
